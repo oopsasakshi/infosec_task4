@@ -381,20 +381,21 @@ pwn.college{sp8GquA054J-Jq1EWBobtBZlrc2.0lNwMDOxwyN2MDM1EzW}
 
 **Task:**
 
-This challenge introduces process substitution . The goal is to find a hidden flag by comparing the live outputs of two different programs without saving them to physical files.
+This challenge demonstrates how to send the same output to multiple programs at the same time.
+The goal is to take the output from `/challenge/hack` and provide it simultaneously as input to both `/challenge/the` and `/challenge/planet`.
 
 **Commands Used:**
 
 ```bash
 ssh hacker@dojo.pwn.college
-/challenge/hack | tee >(/challenge/the) |  >(/challenge/planet)
+/challenge/hack | tee >(/challenge/the) | >(/challenge/planet)
 /challenge/hack | tee >(/challenge/the) >(/challenge/planet)
 ```
 
 **Explanation:**
 
-`/challenge/print_decoys` prints only fake flags, while `/challenge/print_decoys_and_flag` prints the same fake flags plus the real one.
-Process substitution `<(command)` lets `diff` compare their outputs directly without using files.
+The pipe `|` sends this output forward, while `tee` duplicates it (splits the data into multiple streams).
+Using process substitution `>(command)`, the duplicated output is written directly into the input of `/challenge/the` and `/challenge/planet`.
 
 **Output:**
 ```bash
@@ -406,4 +407,74 @@ pwn.college{8ia7__u5efKAlo3vXX8VmUFQTHk.QXwgDN1wyN2MDM1EzW}
 **Flag:**
 ```bash
 pwn.college{8ia7__u5efKAlo3vXX8VmUFQTHk.QXwgDN1wyN2MDM1EzW}
+```
+
+### Challenge: Split Piping Stderr And Stdout
+
+**Task:**
+
+This challenge demonstrates how to separate a program’s normal output and error output and send them to two different programs.
+
+**Commands Used:**
+
+```bash
+ssh hacker@dojo.pwn.college
+/challenge/hack | >( /challenge/planet) | 2> >( /challenge/the )
+/challenge/hack | tee >( /challenge/planet ) 2> >( /challenge/the )
+/challenge/hack > >( /challenge/planet ) 2> >( /challenge/the )
+```
+
+**Explanation:**
+
+The `>` operator redirects standard output, while `2>` redirects standard error.
+Process substitution `>(command)` turns a program into a writable input stream.
+Here:
+* `> >( /challenge/planet )` sends stdout into `/challenge/planet`
+* `2> >( /challenge/the )` sends stderr into `/challenge/the`
+
+**Output:**
+```bash
+Congratulations, you have learned a redirection technique that even experts
+struggle with! Here is your flag:
+pwn.college{4eHgLKmYVo_uJWOElB6AhveI4cD.QXxQDM2wyN2MDM1EzW}
+```
+
+**Flag:**
+```bash
+pwn.college{4eHgLKmYVo_uJWOElB6AhveI4cD.QXxQDM2wyN2MDM1EzW}
+```
+### Challenge: Named Pipes
+
+**Task:**
+
+This challenge introduces named pipes (FIFOs), which allow two separate programs to communicate through a shared pipe file.
+The goal is to redirect the output of `/challenge/run` into a FIFO and read it from another process to retrieve the flag.
+
+**Commands Used:**
+
+```bash
+ssh hacker@dojo.pwn.college
+mkfifo /tmp/flag_fifo
+cat /tmp/flag_fifo
+ /challenge/run > /tmp/flag_fifo
+```
+
+**Explanation:**
+
+Here:
+* `mkfifo /tmp/flag_fifo` creates a named pipe.
+* `cat /tmp/flag_fifo` starts a reader and waits for data.
+* In another terminal, `/challenge/run > /tmp/flag_fifo` starts the writer.
+ Named pipes block until both a reader and a writer are connected. Once both sides are active, data flows through the pipe instantly.This is why two terminals are required.
+
+**Output:**
+```bash
+You've correctly redirected /challenge/run's stdout to a FIFO at
+/tmp/flag_fifo! Here is your flag:
+pwn.college{oz6yGW8GKjFPrkfUP5PZjaBKxnN.01MzMDOxwyN2MDM1EzW}
+```
+
+**Flag:**
+```bash
+pwn.college{oz6yGW8GKjFPrkfUP5PZjaBKxnN.01MzMDOxwyN2MDM1EzW}
 ```
