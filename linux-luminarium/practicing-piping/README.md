@@ -315,7 +315,7 @@ pwn.college{sIH6k5ohQDZkhtBirbzLR99BmKD.01NxQTMywyN2MDM1EzW}
 
 **Task:**
 
-This challenge demonstrates how to pass data between programs while also inspecting it for debugging.
+This challenge demonstrates how to send data from one program to another while also viewing or saving a copy of that data. The goal is to understand how piping works between programs and how tee can be used for inspection and debugging.
 
 **Commands Used:**
 
@@ -347,4 +347,63 @@ pwn.college{I_iHbjyvX5bIaU9ewGkbZPIoV.QXxIT00wyN2MDM1EzW}
 **Flag:**
 ```bash
 pwn.college{I_iHbjyvX5bIaU9ewGkbZPIoV.QXxIT00wyN2MDM1EzW}
+```
+
+### Challenge: Process Substitution For Input
+
+**Task:**
+
+This challenge introduces process substitution . The goal is to find a hidden flag by comparing the live outputs of two different programs without saving them to physical files.
+
+**Commands Used:**
+
+```bash
+ssh hacker@dojo.pwn.college
+ diff <(/challenge/print_decoys) <(/challenge/print_decoys_and_flag)
+```
+
+**Explanation:**
+
+`/challenge/print_decoys` prints only fake flags, while `/challenge/print_decoys_and_flag` prints the same fake flags plus the real one.
+Process substitution `<(command)` lets `diff` compare their outputs directly without using files.
+
+**Output:**
+```bash
+67a68
+> pwn.college{sp8GquA054J-Jq1EWBobtBZlrc2.0lNwMDOxwyN2MDM1EzW}
+```
+
+**Flag:**
+```bash
+pwn.college{sp8GquA054J-Jq1EWBobtBZlrc2.0lNwMDOxwyN2MDM1EzW}
+```
+### Challenge: Writing To Multiple Programs
+
+**Task:**
+
+This challenge introduces process substitution . The goal is to find a hidden flag by comparing the live outputs of two different programs without saving them to physical files.
+
+**Commands Used:**
+
+```bash
+ssh hacker@dojo.pwn.college
+/challenge/hack | tee >(/challenge/the) |  >(/challenge/planet)
+/challenge/hack | tee >(/challenge/the) >(/challenge/planet)
+```
+
+**Explanation:**
+
+`/challenge/print_decoys` prints only fake flags, while `/challenge/print_decoys_and_flag` prints the same fake flags plus the real one.
+Process substitution `<(command)` lets `diff` compare their outputs directly without using files.
+
+**Output:**
+```bash
+Congratulations, you have duplicated data into the input of two programs! Here
+is your flag:
+pwn.college{8ia7__u5efKAlo3vXX8VmUFQTHk.QXwgDN1wyN2MDM1EzW}
+```
+
+**Flag:**
+```bash
+pwn.college{8ia7__u5efKAlo3vXX8VmUFQTHk.QXwgDN1wyN2MDM1EzW}
 ```
