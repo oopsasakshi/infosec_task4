@@ -166,4 +166,93 @@ _=/run/dojo/bin/env
 ```bash
 pwn.college{ApUpbr9hs1txcU-DKcg-slS-5GI.QX4UTN0wyN2MDM1EzW}
 ```
+### Challenge: Storing Command Output
 
+**Task:**
+
+This challenge teaches command substitution, which allows the output of a command to be stored directly inside a variable.
+
+**Commands Used:**
+
+```bash
+ ssh hacker@dojo.pwn.college
+ PWN=$(/challenge/run)
+ echo "$PWN"
+```
+**Explanation:**
+
+`$(command)` is called command substitution.It runs the command and captures its standard output.
+`PWN=$(/challenge/run)` executes `/challenge/run` and stores its output inside the variable PWN.
+
+**Output:**
+
+```bash
+Congratulations! You have read the flag into the PWN variable. Now print it out
+and submit it!
+pwn.college{EWJEoch_UZEWm0wt7ByGx4-7Juw.QX1cDN1wyN2MDM1EzW}
+```
+
+**Flag:**
+```bash
+pwn.college{EWJEoch_UZEWm0wt7ByGx4-7Juw.QX1cDN1wyN2MDM1EzW}
+```
+
+### Challenge: Reading Input
+
+**Task:**
+
+This challenge introduces the `read` builtin, which reads user input from standard input and stores it in a variable.
+The goal is to use `read` to set the variable `PWN` to the value `COLLEGE`.
+
+**Commands Used:**
+
+```bash
+ ssh hacker@dojo.pwn.college
+read -p "INPUT: " PWN
+INPUT: COLLEGE
+```
+**Explanation:**
+
+* `read` waits for user input and assigns it to a variable.
+* The `-p` flag displays a prompt `INPUT:` before reading input.
+
+**Output:**
+
+```bash
+You've set the PWN variable properly! As promised, here is the flag:
+pwn.college{kfgzILwzNPvh_Z34jbrgFvvo_dM.QX4cTN0wyN2MDM1EzW}
+```
+
+**Flag:**
+```bash
+pwn.college{kfgzILwzNPvh_Z34jbrgFvvo_dM.QX4cTN0wyN2MDM1EzW}
+```
+### Challenge: Reading Files
+
+**Task:**
+
+This challenge teaches how to read file contents directly into a shell variable using input redirection, without using `cat`.
+
+**Commands Used:**
+
+```bash
+ ssh hacker@dojo.pwn.college
+ read PWN < /challenge/read_me
+```
+**Explanation:**
+
+* `read` normally reads from standard input.
+* Using `< /challenge/read_me` redirects the file’s contents into `read`.
+* The file’s content is stored directly in the variable `PWN`.
+
+**Output:**
+
+```bash
+You've set the PWN variable properly! As promised, here is the flag:
+pwn.college{4vAChzkUFtInfG2buyBrMNXeUFv.QXwIDO0wyN2MDM1EzW}
+```
+
+**Flag:**
+```bash
+pwn.college{4vAChzkUFtInfG2buyBrMNXeUFv.QXwIDO0wyN2MDM1EzW}
+```
