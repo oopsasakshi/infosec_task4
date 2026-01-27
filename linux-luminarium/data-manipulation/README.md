@@ -1,4 +1,4 @@
-## Module 7: Data Manipulation
+## Module 8: Data Manipulation
 
 ### Challenge: Translating Characters
 
