@@ -322,6 +322,8 @@ YOdjHdSOoKvDQNWu6ucyLRAWFuISeXw9a/9p7ftpxm0TSgyvmfLF2MIAEwyzRqaM
 dxviW8+TFVEBl1O4f7HVm6EpTscdDxU+bCXWkfjuRb7Dy9GOtt9JPsX8MBTakzh3
 vBgsyi/sN3RqRBcGU40fOoZyfAMT8s1m/uYv52O6IgeuZ/ujbjY=
 -----END RSA PRIVATE KEY-----
+
+EReVavePLFHtFlFsjn3hyzMlvSuSAcRD
 ```
 
 **Flag:**
@@ -354,7 +356,47 @@ YOdjHdSOoKvDQNWu6ucyLRAWFuISeXw9a/9p7ftpxm0TSgyvmfLF2MIAEwyzRqaM
 dxviW8+TFVEBl1O4f7HVm6EpTscdDxU+bCXWkfjuRb7Dy9GOtt9JPsX8MBTakzh3
 vBgsyi/sN3RqRBcGU40fOoZyfAMT8s1m/uYv52O6IgeuZ/ujbjY=
 -----END RSA PRIVATE KEY-----
+
+EReVavePLFHtFlFsjn3hyzMlvSuSAcRD
 ```
 ## Level 17 → Level 18
 
 **Task:**
+A service running on `port 30001` requires the current level password to be submitted using SSL/TLS encryption.
+The goal is to establish an encrypted connection and send the password to retrieve the next level password.
+
+**Command Used:**
+
+```bash
+  ssh bandit15@bandit.labs.overthewire.org -p 2220
+ echo "8xCjnmgoKbGLhHFAZlGE5Tmu4M2tKJQo" | openssl s_client -connect localhost:30001 -quiet
+```
+**Explanation:**
+
+In this challenge :
+* `openssl s_client`
+   * Creates an `SSL/TLS` encrypted client connection.
+   * `SSL/TLS` is used to encrypt data during transmission so that sensitive information like passwords cannot        be read by others on the network.
+   * `nc` sends plain text only and service on port 30001 expects encrypted data so it ignores or rejects plain       text.
+* `-connect localhost:30001`connects to the service running on port 30001.
+* `-quiet` suppresses SSL handshake messages (like DONE , RENEGOTIATING ,KEYUPDATE) and displays only the server    response.
+  
+**Output:**
+
+```bash
+ localhost:30001 -quiet
+Can't use SSL_get_servername
+depth=0 CN = SnakeOil
+verify error:num=18:self-signed certificate
+verify return:1
+depth=0 CN = SnakeOil
+verify return:1
+Correct!
+kSkvUpMQ7lBYyCM4GBPvCvT1BfWRy0Dx
+```
+
+**Flag:**
+
+```bash
+kSkvUpMQ7lBYyCM4GBPvCvT1BfWRy0Dx
+```
