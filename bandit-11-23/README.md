@@ -461,8 +461,9 @@ The goal is to use this binary to access the password for the next level stored 
 ```bash
 ssh bandit19@bandit.labs.overthewire.org -p 2220
 ls
-./bandit20-do
-./bandit20-do cat /etc/bandit_pass/bandit20
+cat /etc/bandit_pass/bandit20
+echo "<bandit20_password>" | nc -l 1234 &
+./suconnect 1234
 ```
 **Explanation:**
 
@@ -472,8 +473,13 @@ In this challenge :
 * When the program is run without any arguments, it shows instructions that make it clear it can run commands as the `bandit20` user.
 * By using the binary to `cat` the password file, the contents of `/etc/bandit_pass/bandit20` can be read.
   
-**Output/Flag:**
-
+**Output:**
 ```bash
-0qXahG8ZjOVMN9Ghs7iOWsCfZyXOUbYO
+Read: 0qXahG8ZjOVMN9Ghs7iOWsCfZyXOUbYO
+Password matches, sending next password
+EeoULMCra2q0dSkYj561DX7s1CpBuOBt
+```
+**Flag:**
+```bash
+EeoULMCra2q0dSkYj561DX7s1CpBuOBt
 ```
