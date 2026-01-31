@@ -259,15 +259,6 @@ echo "kSkvUpMQ7lBYyCM4GBPvCvT1BfWRy0Dx" | openssl s_client -connect localhost:31
 echo "kSkvUpMQ7lBYyCM4GBPvCvT1BfWRy0Dx" | openssl s_client -connect localhost:31691 -quiet
 echo "kSkvUpMQ7lBYyCM4GBPvCvT1BfWRy0Dx" | openssl s_client -connect localhost:31790 -quiet
 ```
-**Explanation:**
-
-In this challenge :
-Got it 👍
-I’ll **rewrite only the Explanation section**, strictly based on the **commands you used**, in **clear, beginner-friendly bullet points**, without changing your structure or adding extra tools.
-
-You can paste this directly under **Explanation**.
-
----
 
 ### **Explanation:**
 
@@ -281,7 +272,7 @@ In this challenge:
   * Some ports returned SSL errors .
   * Some ports simply echoed the password back .
   * `3179` port returned a RSA private key.
-
+* copied the rsa to key17 txt file on the local machine.
 
   
 **Output:**
@@ -362,41 +353,127 @@ EReVavePLFHtFlFsjn3hyzMlvSuSAcRD
 ## Level 17 → Level 18
 
 **Task:**
-A service running on `port 30001` requires the current level password to be submitted using SSL/TLS encryption.
-The goal is to establish an encrypted connection and send the password to retrieve the next level password.
+
+To access bandit17, we must first log in using the RSA private key obtained in the previous level.
+The goal is to find password for the next level that is only line that differs between two files.
 
 **Command Used:**
 
 ```bash
-  ssh bandit15@bandit.labs.overthewire.org -p 2220
- echo "8xCjnmgoKbGLhHFAZlGE5Tmu4M2tKJQo" | openssl s_client -connect localhost:30001 -quiet
+notepad key17
+icacls key17 /inheritance:r
+icacls key17 /grant:r "$($env:USERNAME):(R)"
+ssh -i key17 bandit17@bandit.labs.overthewire.org -p 2220
+
 ```
 **Explanation:**
 
+While login:
+* `icacls key17 /inheritance:r`
+   * ensures the private key does not inherit access rights from parent folders, which SSH considers insecure.
+* `icacls key17 /grant:r "$($env:USERNAME):(R)"`
+   * grants read-only permission to the current user only.SSH requires private keys to be readable only by the           owner; otherwise, it refuses to use the key.
+     
 In this challenge :
-* `openssl s_client`
-   * Creates an `SSL/TLS` encrypted client connection.
-   * `SSL/TLS` is used to encrypt data during transmission so that sensitive information like passwords cannot        be read by others on the network.
-   * `nc` sends plain text only and service on port 30001 expects encrypted data so it ignores or rejects plain       text.
-* `-connect localhost:30001`connects to the service running on port 30001.
-* `-quiet` suppresses SSL handshake messages (like DONE , RENEGOTIATING ,KEYUPDATE) and displays only the server    response.
-  
+
+* After successful login, the home directory contains two files:
+  * `passwords.old`
+  * `passwords.new`
+* The diff command compares both files line by line and prints only the changed line.
+  * `<` line from the first file (passwords.old)
+  * `> `line from the second file (passwords.new)
 **Output:**
 
 ```bash
- localhost:30001 -quiet
-Can't use SSL_get_servername
-depth=0 CN = SnakeOil
-verify error:num=18:self-signed certificate
-verify return:1
-depth=0 CN = SnakeOil
-verify return:1
-Correct!
-kSkvUpMQ7lBYyCM4GBPvCvT1BfWRy0Dx
+42c42
+< BMIOFKM7CRSLI97voLp3TD80NAq5exxk
+---
+> x2gLTTjFwMOhQ8oWNbMN362QKxfRqGlO
 ```
 
 **Flag:**
 
 ```bash
-kSkvUpMQ7lBYyCM4GBPvCvT1BfWRy0Dx
+x2gLTTjFwMOhQ8oWNbMN362QKxfRqGlO
+```
+
+## Level 18 → Level 19
+
+**Task:**
+
+The password for the next level is stored in a file named readme in the home directory but the .bashrc file has been modified to immediately log out upon SSH login.
+
+**Command Used:**
+
+```bash
+ssh bandit18@bandit.labs.overthewire.org -p 2220
+ssh bandit18@bandit.labs.overthewire.org -p 2220 "cat readme"
+```
+**Explanation:**
+
+In this challenge, logging in via SSH starts an interactive shell, which automatically executes `.bashrc` that immediately logs us out, blocking normal access.
+
+By passing a command directly to SSH, no interactive shell is started.
+Since `.bashrc` is never executed, the command runs successfully and the readme file can be read before logout.
+  
+**Output/Flag:**
+
+```bash
+ cGWpMaKXVwDUNgPAVJbWYuGHVn9zl3j8
+```
+## Level 19 → Level 20
+
+**Task:**
+
+A setuid program in the home directory allows commands to be executed as another user.
+The goal is to use this binary to access the password for the next level stored in `/etc/bandit_pass`.
+
+**Command Used:**
+
+```bash
+ssh bandit19@bandit.labs.overthewire.org -p 2220
+ls
+./bandit20-do
+./bandit20-do cat /etc/bandit_pass/bandit20
+```
+**Explanation:**
+
+In this challenge :
+* The file `bandit20-do` is a setuid binary.
+  * A setuid binary runs with the permissions of its owner, not the user executing it.
+* When the program is run without any arguments, it shows instructions that make it clear it can run commands as the `bandit20` user.
+* By using the binary to `cat` the password file, the contents of `/etc/bandit_pass/bandit20` can be read.
+  
+**Output/Flag:**
+
+```bash
+0qXahG8ZjOVMN9Ghs7iOWsCfZyXOUbYO
+```
+## Level 20 → Level 21
+
+**Task:**
+
+A setuid program in the home directory allows commands to be executed as another user.
+The goal is to use this binary to access the password for the next level stored in `/etc/bandit_pass`.
+
+**Command Used:**
+
+```bash
+ssh bandit19@bandit.labs.overthewire.org -p 2220
+ls
+./bandit20-do
+./bandit20-do cat /etc/bandit_pass/bandit20
+```
+**Explanation:**
+
+In this challenge :
+* The file `bandit20-do` is a setuid binary.
+  * A setuid binary runs with the permissions of its owner, not the user executing it.
+* When the program is run without any arguments, it shows instructions that make it clear it can run commands as the `bandit20` user.
+* By using the binary to `cat` the password file, the contents of `/etc/bandit_pass/bandit20` can be read.
+  
+**Output/Flag:**
+
+```bash
+0qXahG8ZjOVMN9Ghs7iOWsCfZyXOUbYO
 ```
