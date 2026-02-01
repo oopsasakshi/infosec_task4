@@ -537,16 +537,9 @@ ssh bandit23@bandit.labs.overthewire.org -p 2220
 **Explanation:**
 
 In this challenge :
-* `suconnect` is a setuid binary that runs with higher privileges.It connects to localhost on a port given     as an argument.
-* `echo "0qXahG8ZjOVMN9Ghs7iOWsCfZyXOUbYO" | nc -l 1234 &`
-    * `echo "0qXahG8ZjOVMN9Ghs7iOWsCfZyXOUbYO" |` sends passwords to `nc -l 1234 & `
-* `nc -l 1234` starts netcat in listening mode on port 1234.This acts as a local server, waiting for a          connection.
-* `&` runs the command in the background.
-     * This allows the terminal to be used to run suconnect at the same time.
-     * When `suconnect` connects to this port, the password is automatically sent.
-* `./suconnect 1234` executes the setuid binary.
-    * Connects to localhost on `port 1234`.
-    * Reads the password sent by `nc`.
+* `/usr/bin/cronjob_bandit23.sh` reveals that the cron script stores the password in `/tmp` using a filename generated from a hash of the string `I am user bandit23`, allowing the filename to be recreated by following the same logic.
+* `echo I am user bandit23 | md5sum` is used to generate the same hash that the cron script uses as the filename.The output of this command is a hash value, and only the first part of this output is required, as it represents the exact filename.
+* Using `cat /tmp/8ca319486bfbbc3663ea0fbe81326349` reads the file created by the cron job, which contains the password for the next level.
       
 **Output:**
 ```bash
