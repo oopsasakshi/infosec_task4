@@ -453,26 +453,31 @@ In this challenge :
 
 **Task:**
 
-A setuid program in the home directory allows commands to be executed as another user.
-The goal is to use this binary to access the password for the next level stored in `/etc/bandit_pass`.
+The goal is to send the correct password through setuid binary and receive the password for the next level.
 
 **Command Used:**
 
 ```bash
-ssh bandit19@bandit.labs.overthewire.org -p 2220
+ssh bandit20@bandit.labs.overthewire.org -p 2220
 ls
 cat /etc/bandit_pass/bandit20
-echo "<bandit20_password>" | nc -l 1234 &
+echo "0qXahG8ZjOVMN9Ghs7iOWsCfZyXOUbYO" | nc -l 1234 &
 ./suconnect 1234
 ```
 **Explanation:**
 
 In this challenge :
-* The file `bandit20-do` is a setuid binary.
-  * A setuid binary runs with the permissions of its owner, not the user executing it.
-* When the program is run without any arguments, it shows instructions that make it clear it can run commands as the `bandit20` user.
-* By using the binary to `cat` the password file, the contents of `/etc/bandit_pass/bandit20` can be read.
-  
+* `suconnect` is a setuid binary that runs with higher privileges.It connects to localhost on a port given     as an argument.
+* `echo "0qXahG8ZjOVMN9Ghs7iOWsCfZyXOUbYO" | nc -l 1234 &`
+    * `echo "0qXahG8ZjOVMN9Ghs7iOWsCfZyXOUbYO" |` sends passwords to `nc -l 1234 & `
+* `nc -l 1234` starts netcat in listening mode on port 1234.This acts as a local server, waiting for a          connection.
+* `&` runs the command in the background.
+     * This allows the terminal to be used to run suconnect at the same time.
+     * When `suconnect` connects to this port, the password is automatically sent.
+* `./suconnect 1234` executes the setuid binary.
+    * Connects to localhost on `port 1234`.
+    * Reads the password sent by `nc`.
+
 **Output:**
 ```bash
 Read: 0qXahG8ZjOVMN9Ghs7iOWsCfZyXOUbYO
@@ -482,4 +487,78 @@ EeoULMCra2q0dSkYj561DX7s1CpBuOBt
 **Flag:**
 ```bash
 EeoULMCra2q0dSkYj561DX7s1CpBuOBt
+```
+## Level 21 → Level 22
+
+**Task:**
+
+The goal is to inspect the cron job, understand what it does, and retrieve the password it stores.
+
+**Command Used:**
+
+```bash
+ssh bandit21@bandit.labs.overthewire.org -p 2220
+ ls /etc/cron.d
+ cat /etc/cron.d/cronjob_bandit22
+ cat /usr/bin/cronjob_bandit22.sh
+ cat  /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv
+```
+**Explanation:**
+
+In this challenge :
+* `cron` is a time-based scheduler that runs commands automatically.
+* The cron configuration file `/etc/cron.d/cronjob_bandit22` shows that a script is executed every minute as `bandit22`.
+* The script `/usr/bin/cronjob_bandit22.sh` copies the password for bandit22 into a file inside `/tmp` and makes it readable.
+* Directory listing of `/tmp` is restricted, so the file cannot be discovered using `ls`.
+* Once the cron job runs, the password file exists and can be accessed directly using its exact path.
+
+**Output/Flag:**
+```bash
+tRae0UfB9v0UzbCdn9cY0gQnds9GF58Q
+```
+
+## Level 22 → Level 23
+
+**Task:**
+
+A cron job automatically runs a script that stores the password using a generated filename.
+The goal is to understand how this filename is created and use it to locate and read the next level’s password.
+
+**Command Used:**
+
+```bash
+ssh bandit23@bandit.labs.overthewire.org -p 2220
+ ls /etc/cron.d
+ cat /etc/cron.d/cronjob_bandit23
+ cat /usr/bin/cronjob_bandit23.sh
+ echo I am user bandit23 | md5sum
+ cat /tmp/8ca319486bfbbc3663ea0fbe81326349
+```
+**Explanation:**
+
+In this challenge :
+* `suconnect` is a setuid binary that runs with higher privileges.It connects to localhost on a port given     as an argument.
+* `echo "0qXahG8ZjOVMN9Ghs7iOWsCfZyXOUbYO" | nc -l 1234 &`
+    * `echo "0qXahG8ZjOVMN9Ghs7iOWsCfZyXOUbYO" |` sends passwords to `nc -l 1234 & `
+* `nc -l 1234` starts netcat in listening mode on port 1234.This acts as a local server, waiting for a          connection.
+* `&` runs the command in the background.
+     * This allows the terminal to be used to run suconnect at the same time.
+     * When `suconnect` connects to this port, the password is automatically sent.
+* `./suconnect 1234` executes the setuid binary.
+    * Connects to localhost on `port 1234`.
+    * Reads the password sent by `nc`.
+      
+**Output:**
+```bash
+#!/bin/bash
+myname=$(whoami)
+mytarget=$(echo I am user $myname | md5sum | cut -d ' ' -f 1)
+echo "Copying passwordfile /etc/bandit_pass/$myname to /tmp/$mytarget"
+cat /etc/bandit_pass/$myname > /tmp/$mytarget
+0Zf11ioIjMVN551jX3CmStKLYqjk54Ga
+```
+
+**Output/Flag:**
+```bash
+0Zf11ioIjMVN551jX3CmStKLYqjk54Ga
 ```
